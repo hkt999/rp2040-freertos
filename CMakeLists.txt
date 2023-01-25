@@ -39,6 +39,8 @@ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DTSDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DTSDEBUG")
 set(FREERTOS_CFG_DIRECTORY "${CMAKE_SOURCE_DIR}/Config")
 set(FREERTOS_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/FreeRTOS-Kernel")
+set(POSIX_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/POSIX/FreeRTOS-Plus-POSIX/source")
+set(POSIX_INC_DIRECTORY "${CMAKE_SOURCE_DIR}/POSIX/FreeRTOS-Plus-POSIX/include")
 
 # Include the Pico SDK
 include(pico_sdk_import.cmake)
@@ -61,7 +63,9 @@ add_library(FreeRTOS STATIC
     ${FREERTOS_SRC_DIRECTORY}/tasks.c
     ${FREERTOS_SRC_DIRECTORY}/timers.c
     ${FREERTOS_SRC_DIRECTORY}/portable/MemMang/heap_3.c
-    ${FREERTOS_SRC_DIRECTORY}/portable/GCC/ARM_CM0/port.c
+	${FREERTOS_SRC_DIRECTORY}/portable/GCC/ARM_CM0/port.c
+	${FREERTOS_SRC_DIRECTORY}/portable/ThirdParty/GCC/RP2040/idle_task_static_memory.c
+#	${FREERTOS_SRC_DIRECTORY}/portable/ThirdParty/GCC/RP2040/port.c
 )
 
 # Build FreeRTOS
@@ -69,6 +73,40 @@ target_include_directories(FreeRTOS PUBLIC
     ${FREERTOS_CFG_DIRECTORY}/
     ${FREERTOS_SRC_DIRECTORY}/include
     ${FREERTOS_SRC_DIRECTORY}/portable/GCC/ARM_CM0
+#	${FREERTOS_SRC_DIRECTORY}/portable/ThirdParty/GCC/RP2040/include
+	pico-sdk/src/boards/include/boards
+	pico-sdk/src/rp2_common/hardware_clocks/include
+	pico-sdk/src/rp2_common/hardware_base/include
+	pico-sdk/src/rp2_common/hardware_exception/include
+	pico-sdk/src/rp2040/hardware_structs/include
+	pico-sdk/src/rp2040/hardware_regs/include
+)
+
+# Add POSIX as a library
+add_library(POSIX STATIC
+	${POSIX_SRC_DIRECTORY}/FreeRTOS_POSIX_clock.c
+	${POSIX_SRC_DIRECTORY}/FreeRTOS_POSIX_mqueue.c
+	${POSIX_SRC_DIRECTORY}/FreeRTOS_POSIX_pthread.c
+	${POSIX_SRC_DIRECTORY}/FreeRTOS_POSIX_pthread_barrier.c
+	${POSIX_SRC_DIRECTORY}/FreeRTOS_POSIX_pthread_cond.c
+	${POSIX_SRC_DIRECTORY}/FreeRTOS_POSIX_pthread_mutex.c
+	${POSIX_SRC_DIRECTORY}/FreeRTOS_POSIX_sched.c
+	${POSIX_SRC_DIRECTORY}/FreeRTOS_POSIX_semaphore.c
+	${POSIX_SRC_DIRECTORY}/FreeRTOS_POSIX_timer.c
+	${POSIX_SRC_DIRECTORY}/FreeRTOS_POSIX_unistd.c
+	${POSIX_SRC_DIRECTORY}/FreeRTOS_POSIX_utils.c
+)
+
+target_include_directories(POSIX PUBLIC
+    ${FREERTOS_CFG_DIRECTORY}/
+    ${FREERTOS_SRC_DIRECTORY}/include
+	${POSIX_INC_DIRECTORY}
+	${POSIX_INC_DIRECTORY}/portable
+	${POSIX_INC_DIRECTORY}/portable/rp2040
+	POSIX/include
+	POSIX/include/private
+	FreeRTOS-Kernel/portable/GCC/ARM_CM33/non_secure/
+	FreeRTOS-Kernel/portable/ARMv8M/non_secure/portable/GCC/ARM_CM33
 )
 
 # Include the apps' source code
