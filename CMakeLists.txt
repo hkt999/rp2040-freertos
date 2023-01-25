@@ -65,7 +65,8 @@ add_library(FreeRTOS STATIC
     ${FREERTOS_SRC_DIRECTORY}/portable/MemMang/heap_3.c
 	${FREERTOS_SRC_DIRECTORY}/portable/GCC/ARM_CM0/port.c
 	${FREERTOS_SRC_DIRECTORY}/portable/ThirdParty/GCC/RP2040/idle_task_static_memory.c
-#	${FREERTOS_SRC_DIRECTORY}/portable/ThirdParty/GCC/RP2040/port.c
+	posix_portable/timer_task_static_memory.c
+
 )
 
 # Build FreeRTOS
@@ -73,13 +74,6 @@ target_include_directories(FreeRTOS PUBLIC
     ${FREERTOS_CFG_DIRECTORY}/
     ${FREERTOS_SRC_DIRECTORY}/include
     ${FREERTOS_SRC_DIRECTORY}/portable/GCC/ARM_CM0
-#	${FREERTOS_SRC_DIRECTORY}/portable/ThirdParty/GCC/RP2040/include
-	pico-sdk/src/boards/include/boards
-	pico-sdk/src/rp2_common/hardware_clocks/include
-	pico-sdk/src/rp2_common/hardware_base/include
-	pico-sdk/src/rp2_common/hardware_exception/include
-	pico-sdk/src/rp2040/hardware_structs/include
-	pico-sdk/src/rp2040/hardware_regs/include
 )
 
 # Add POSIX as a library
@@ -105,8 +99,7 @@ target_include_directories(POSIX PUBLIC
 	${POSIX_INC_DIRECTORY}/portable/rp2040
 	POSIX/include
 	POSIX/include/private
-	FreeRTOS-Kernel/portable/GCC/ARM_CM33/non_secure/
-	FreeRTOS-Kernel/portable/ARMv8M/non_secure/portable/GCC/ARM_CM33
+	FreeRTOS-Kernel/portable/GCC/ARM_CM0
 )
 
 # Include the apps' source code
